@@ -78,10 +78,21 @@
 #pragma mark - 
 #pragma mark UITableViewDataSource
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return [self.source numberOfSections];
+}
+
 //| ----------------------------------------------------------------------------
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return [self.source numberOfRowsInSection:section];
+}
+
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return self.source.tasks[section][@"text"];
 }
 
 
@@ -101,7 +112,7 @@
         [(Checkbox*)cell.accessoryView addTarget:self action:@selector(checkBoxTapped:forEvent:) forControlEvents:UIControlEventValueChanged];
     }
     
-	NSDictionary *item = self.source.tasks[(NSUInteger)indexPath.row];
+	NSDictionary *item = self.source.tasks[indexPath.section][@"rows"][indexPath.row];
     
 	cell.textLabel.text = [item objectForKey:@"text"];
     [(Checkbox*)cell.accessoryView setChecked: [item[@"checked"] boolValue] ];
@@ -188,7 +199,7 @@
     if (rand() % 2 == 0) {
         self.source.tasks = @[
                               @{@"text": @"今日",
-                                @"value": @[
+                                @"rows": @[
                                         @{@"text": @"hoge", @"checked": @NO},
                                         @{@"text": @"fuga", @"checked": @NO},
                                         @{@"text": @"foo", @"checked": @NO},
@@ -197,7 +208,7 @@
                                         ],
                                 },
                               @{@"text": @"明日",
-                                @"value": @[
+                                @"rows": @[
                                         @{@"text": @"hoge", @"checked": @NO},
                                         @{@"text": @"fuga", @"checked": @NO},
                                         @{@"text": @"foo", @"checked": @NO},
@@ -209,25 +220,24 @@
     } else {
         self.source.tasks = @[
                               @{@"text": @"今日",
-                                @"value": @[
+                                @"rows": @[
                                         @{@"text": @"hoge", @"checked": @NO},
                                         @{@"text": @"fuga", @"checked": @NO},
-                                        @{@"text": @"foo", @"checked": @NO},
+                                        @{@"text": @"fooooo", @"checked": @NO},
                                         @{@"text": @"bar", @"checked": @NO},
                                         @{@"text": @"baz", @"checked": @NO},
                                         ],
                                 },
                               @{@"text": @"明日",
-                                @"value": @[
+                                @"rows": @[
                                         @{@"text": @"hoge", @"checked": @NO},
                                         @{@"text": @"fuga", @"checked": @NO},
                                         @{@"text": @"foo", @"checked": @NO},
                                         @{@"text": @"bar", @"checked": @NO},
-                                        @{@"text": @"baz", @"checked": @NO},
                                         ],
                                 },
                               @{@"text": @"今月中",
-                                @"value": @[
+                                @"rows": @[
                                         @{@"text": @"hoge", @"checked": @NO},
                                         @{@"text": @"fuga", @"checked": @NO},
                                         @{@"text": @"foo", @"checked": @NO},

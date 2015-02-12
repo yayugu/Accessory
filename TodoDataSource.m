@@ -24,7 +24,7 @@
 
 - (NSInteger)numberOfRowsInSection:(NSInteger)section
 {
-    return [_tasks[section] count];
+    return [_tasks[section][@"rows"] count];
 }
 
 - (NSUInteger)hashForSection:(NSInteger)section
