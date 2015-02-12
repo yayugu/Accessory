@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ATDataSourceDiffPatch.m"
-            timestampString = "445450410.557459"
+            timestampString = "445459254.239292"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "164"
-            endingLineNumber = "164"
+            startingLineNumber = "153"
+            endingLineNumber = "153"
             landmarkName = "-_detectRowUpdates:from:to:forPreviousSection:section:"
             landmarkType = "5">
          </BreakpointContent>
@@ -74,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ATDataSourceDiffPatch.m"
-            timestampString = "445456688.62399"
+            timestampString = "445459254.239292"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "111"
-            endingLineNumber = "111"
+            startingLineNumber = "106"
+            endingLineNumber = "106"
             landmarkName = "-_detectSectionUpdates:from:to:oldSectionMap:newSectionMap:"
             landmarkType = "5">
          </BreakpointContent>
@@ -102,15 +102,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ATDataSourceDiffPatch.m"
-            timestampString = "445456814.07092"
+            timestampString = "445459254.239292"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "165"
-            endingLineNumber = "165"
+            startingLineNumber = "154"
+            endingLineNumber = "154"
             landmarkName = "-_detectRowUpdates:from:to:forPreviousSection:section:"
             landmarkType = "5">
          </BreakpointContent>

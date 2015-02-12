@@ -30,16 +30,14 @@
 {
     NSInteger oldSectionCount = [d1 numberOfSections];
     NSMutableDictionary* oldSectionMap = [[NSMutableDictionary alloc] initWithCapacity:oldSectionCount];
-    for (NSInteger i = 0; i < oldSectionCount; i++)
-    {
+    for (NSInteger i = 0; i < oldSectionCount; i++) {
         NSUInteger hash = [d1 hashForSection:i];
         oldSectionMap[@(hash)] = @(i);
     }
     
     NSInteger newSectionCount = [d2 numberOfSections];
     NSMutableDictionary* newSectionMap = [[NSMutableDictionary alloc] initWithCapacity:newSectionCount];
-    for (NSInteger i = 0; i < newSectionCount; i++)
-    {
+    for (NSInteger i = 0; i < newSectionCount; i++) {
         NSUInteger hash = [d2 hashForSection:i];
         newSectionMap[@(hash)] = @(i);
     }
@@ -59,68 +57,62 @@
     NSUInteger newSectionCount = newSectionMap.count;
     NSInteger oldIndex = 0;
     NSInteger newIndex = 0;
-    NSUInteger oldHash, newHash;
+    NSUInteger oldHash = 0;
+    NSUInteger newHash = 0;
 
-    // Optimize redundant object retrieval
-    BOOL repeatOld = NO;
-    BOOL repeatNew = NO;
+    BOOL moveCursorOld = YES;
+    BOOL moveCursorNew = YES;
     
-    while (true)
-    {
-        if (!repeatOld)
-            oldHash = 0;
-        if (!repeatNew)
-            newHash = 0;
-        if (!oldHash && oldIndex < oldSectionCount)
-            oldHash = [d1 hashForSection:oldIndex];
-        if (!newHash && newIndex < newSectionCount)
-            newHash = [d2 hashForSection:newIndex];
-        
-        repeatOld = repeatNew = NO;
-        
-        if (!oldHash && !newHash)
+    while (true) {
+        if (oldIndex >= oldSectionCount && newIndex >= newSectionCount)
             break;
+        if (moveCursorOld) {
+            oldHash = (oldIndex < oldSectionCount)
+                ? [d1 hashForSection:oldIndex]
+                : 0;
+        }
+        if (moveCursorNew) {
+            newHash = (newIndex < newSectionCount)
+                ? [d2 hashForSection:newIndex]
+                : 0;
+        }
+
         
-        if (oldHash)
-        {
+        moveCursorOld = moveCursorNew = YES;
+        
+        if (oldHash) {
             NSNumber *newIndexToMatchNewId = [newSectionMap objectForKey:@(oldHash)];
             if (!newIndexToMatchNewId)
             {
                 [updates.deleteSections addIndex:oldIndex];
                 oldIndex++;
-                repeatNew = YES;
+                moveCursorNew = NO;
                 continue;
             }
         }
         
-        if (newHash)
-        {
+        if (newHash) {
             NSNumber *oldIndexToMatchNewId = [oldSectionMap objectForKey:@(oldHash)];
-            if (!oldIndexToMatchNewId)
-            {
+            if (!oldIndexToMatchNewId) {
                 [updates.insertSections addIndex:newIndex];
                 newIndex++;
-                repeatOld = YES;
+                moveCursorOld = NO;
                 continue;
             }
         }
         
-        if (newHash && oldHash)
-        {
+        if (newHash && oldHash) {
             BOOL didChange = (oldHash != newHash);
-            if (didChange)
-            {
+            if (didChange) {
                 [updates.reloadSections addIndex:oldIndex];
             }
-            else
-            {
+            else {
                 // check row changes
                 if ([self _detectRowUpdates:updates
                                        from:d1
                                          to:d2
                          forPreviousSection:oldIndex
-                                    section:newIndex])
-                {
+                                    section:newIndex]) {
                     [updates.reloadSections addIndex:oldIndex];
                 }
             }
@@ -143,20 +135,17 @@
     NSInteger deletes = 0;
     NSInteger reloads = 0;
     NSInteger inserts = 0;
-    @autoreleasepool
-    {
+    @autoreleasepool {
         NSInteger oldRowCount = [d1 numberOfRowsInSection:oldSection];
         NSMutableDictionary* oldRowMap = [[NSMutableDictionary alloc] initWithCapacity:oldRowCount];
-        for (NSInteger i = 0; i < oldRowCount; i++)
-        {
+        for (NSInteger i = 0; i < oldRowCount; i++) {
             NSUInteger hash = [d1 hashAtIndexPath:[NSIndexPath indexPathForRow:i inSection:oldSection]];
             oldRowMap[@(hash)] = @(i);
         }
         
         NSInteger newRowCount = [d2 numberOfRowsInSection:newSection];
         NSMutableDictionary* newRowMap = [[NSMutableDictionary alloc] initWithCapacity:newRowCount];
-        for (NSInteger i = 0; i < newRowCount; i++)
-        {
+        for (NSInteger i = 0; i < newRowCount; i++) {
             NSUInteger hash = [d2 hashAtIndexPath:[NSIndexPath indexPathForRow:i inSection:newSection]];
             newRowMap[@(hash)] = @(i);
         }
@@ -168,61 +157,59 @@
         
         NSInteger oldIndex = 0;
         NSInteger newIndex = 0;
-        NSUInteger oldHash, newHash;
+        NSUInteger oldHash = 0;
+        NSUInteger newHash = 0;
         
-        // Optimize redundant object retrieval
-        BOOL repeatOld = NO;
-        BOOL repeatNew = NO;
+        BOOL moveCusorOld = YES;
+        BOOL moveCursorNew = YES;
         
-        while (true)
-        {
+        while (true) {
             NSIndexPath* oldPath = [NSIndexPath indexPathForRow:oldIndex inSection:oldSection];
             NSIndexPath* newPath = [NSIndexPath indexPathForRow:newIndex inSection:newSection];
-            if (!repeatOld)
-                oldHash = 0;
-            if (!repeatNew)
-                newHash = 0;
-            if (!oldHash && oldIndex < oldRowCount)
-                oldHash = [d1 hashAtIndexPath:oldPath];
-            if (!newHash && newIndex < newRowCount)
-                newHash = [d2 hashAtIndexPath:newPath];
-            
-            repeatOld = repeatNew = NO;
-            
-            if (!oldHash && !newHash)
+            if (oldIndex >= oldRowCount && newIndex >= newRowCount)
                 break;
+            if (moveCusorOld) {
+                if (oldIndex < oldRowCount) {
+                    oldHash = [d1 hashAtIndexPath:oldPath];
+                } else {
+                    oldHash = 0;
+                }
+            }
+            if (moveCursorNew) {
+                if (newIndex < newRowCount) {
+                    newHash = [d2 hashAtIndexPath:newPath];
+                } else {
+                    newHash = 0;
+                }
+            }
             
-            if (oldHash)
-            {
+            moveCusorOld = moveCursorNew = YES;
+            
+            if (oldHash) {
                 NSNumber* newIndexToMatchOldId = newRowMap[@(oldHash)];
-                if (!newIndexToMatchOldId)
-                {
+                if (!newIndexToMatchOldId) {
                     [updates.deleteRows addObject:oldPath];
                     oldIndex++;
                     deletes++;
-                    repeatNew = YES;
+                    moveCursorNew = NO;
                     continue;
                 }
             }
             
-            if (newHash)
-            {
+            if (newHash) {
                 NSNumber* oldIndexToMatchNewId = oldRowMap[@(newHash)];
-                if (!oldIndexToMatchNewId)
-                {
+                if (!oldIndexToMatchNewId) {
                     [updates.insertRows addObject:newPath];
                     newIndex++;
                     inserts++;
-                    repeatOld = YES;
+                    moveCusorOld = NO;
                     continue;
                 }
             }
             
-            if (newHash && oldHash)
-            {
+            if (newHash && oldHash) {
                 BOOL didChange = (oldHash != newHash);
-                if (didChange)
-                {
+                if (didChange) {
                     [updates.reloadRows addObject:oldPath];
                     reloads++;
                 }
@@ -238,33 +225,27 @@
 - (void) _applyUpdates:(ATTableViewUpdates*)updates
 {
     [_tableView beginUpdates];
-    if (updates.deleteSections.count > 0)
-    {
+    if (updates.deleteSections.count > 0) {
         [_tableView deleteSections:updates.deleteSections
             withRowAnimation:UITableViewRowAnimationLeft];
     }
-    if (updates.deleteRows.count > 0)
-    {
+    if (updates.deleteRows.count > 0) {
         [_tableView deleteRowsAtIndexPaths:updates.deleteRows
                     withRowAnimation:UITableViewRowAnimationLeft];
     }
-    if (updates.reloadSections.count > 0)
-    {
+    if (updates.reloadSections.count > 0) {
         [_tableView reloadSections:updates.reloadSections
             withRowAnimation:UITableViewRowAnimationLeft];
     }
-    if (updates.reloadRows.count > 0)
-    {
+    if (updates.reloadRows.count > 0) {
         [_tableView reloadRowsAtIndexPaths:updates.reloadRows
                     withRowAnimation:UITableViewRowAnimationLeft];
     }
-    if (updates.insertSections.count > 0)
-    {
+    if (updates.insertSections.count > 0) {
         [_tableView insertSections:updates.insertSections
             withRowAnimation:UITableViewRowAnimationAutomatic];
     }
-    if (updates.insertRows.count > 0)
-    {
+    if (updates.insertRows.count > 0) {
         [_tableView insertRowsAtIndexPaths:updates.insertRows
                     withRowAnimation:UITableViewRowAnimationAutomatic];
     }
@@ -276,74 +257,34 @@
                      inserts:(NSInteger)inserts
                      reloads:(NSInteger)reloads
 {
-    // Cleanup our modified lists of changes
-    if (deletes)
-    {
+    if (deletes) {
         [updates.deleteRows removeObjectsInRange:NSMakeRange(updates.deleteRows.count - deletes, deletes)];
     }
-    if (inserts)
-    {
+    if (inserts) {
         [updates.insertRows removeObjectsInRange:NSMakeRange(updates.insertRows.count - inserts, inserts)];
     }
-    if (reloads)
-    {
+    if (reloads) {
         [updates.reloadRows removeObjectsInRange:NSMakeRange(updates.reloadRows.count - reloads, reloads)];
     }
-}
-
-- (void)willUpdate
-{
-    /*
-    if ([_updatingDataSource respondsToSelector:@selector(tableViewWillUpdate::)])
-    {
-        [_updatingDataSource tableViewWillUpdate:self];
-    }
-     */
-}
-
-- (void)didUpdate
-{
-    /*
-    if ([_updatingDataSource respondsToSelector:@selector(tableViewDidUpate:)])
-    {
-        [_updatingDataSource tableViewDidUpate:self];
-    }*/
 }
 
 - (void)applyPatch:(ATTableViewUpdates*)patch reloadFlag:(BOOL)reload
 {
     @autoreleasepool
     {
-        [self willUpdate];
-        
-        if (!_tableView.window) {
+        if (!_tableView.window || reload) {
             [_tableView reloadData];
-            [self didUpdate];
             return;
         }
         
-        if (reload) {
-            NSLog(@"something wrong: detectSectionUpdates");
-            [_tableView reloadData];
-            [self didUpdate];
-            return;
-        }
-        
-        @try
-        {
-            // NSLog(@"%@", updates);
+        @try {
             [self _applyUpdates:patch];
-        }
-        @catch (NSException *exception)
-        {
+        } @catch (NSException *exception) {
             NSLog(@"Exception: %@", exception);
             
             [_tableView reloadData];
-            [self didUpdate];
             return;
         }
-        
-        [self didUpdate];
     }
 }
 
